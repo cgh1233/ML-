@@ -1,0 +1,43 @@
+from numpy import *
+import operator
+
+def creat_dataset():
+    #创建数据集
+    data = array([[1.0,1.1],[1.0,1.0],[0,0],[0,0.1],[1,1.2],[0.5,0.5]])
+    labels = ['A','A','A','B','B','B']
+    return data,labels
+
+def KNN(inX,data,labels,k):
+    '''KNN算法用于分类，KNN算法理论分析：选取距离该点欧氏距离最近的k个点，
+    对于k个点类别,遵从少数服从多数原理进行分类'''
+    datasize = data.shape[0]  #获取数据的样本点数
+    #以下根据欧氏距离公式构写代码
+    # tile函数有重复功能，把用户输入样本点inX复制为datasize行，以便用于同构矩阵加减
+
+    diffMat = tile(inX,(datasize,1)) - data
+    sqdiffMat = diffMat ** 2
+    sqdistance  = sqdiffMat.sum(axis=1)
+    distance = sqdistance ** 0.5
+    '''对distance进行排序，argsort函数：将元素按照从小到大顺序返回元素下标
+    '''
+    sortedDistance = distance.argsort()
+    print(sortedDistance)
+    classCount = {}
+    for i in range(k):
+        votelabel = labels[sortedDistance[i]]
+
+        #字典中get函数get(key,0)，其中key是要字典中查找的键，如果字典中没有，则默认为0，到最后计数加1
+        classCount[votelabel] = classCount.get(votelabel,0)+1
+    print(classCount)
+
+    '''其中classCount.items()是以列表返回遍历的值，
+    key=operator.itemetter(1)是按照classCount中第1个数进行排序，
+    reverse=True是由大到小排序'''
+    sortedClassCount = sorted(classCount.items(),key=operator.itemgetter(1),reverse=True)
+    return sortedClassCount[0][0]
+
+if __name__ == '__main__':
+
+    data,labels = creat_dataset()
+    result=KNN([1.4,0],data,labels,3)
+    print(result)
